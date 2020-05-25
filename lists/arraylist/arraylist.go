@@ -2,6 +2,7 @@ package arraylist
 
 import (
 	"fmt"
+	"github.com/wanqon/apostle/utils"
 	"strings"
 )
 
@@ -97,8 +98,11 @@ func (list *List) Clear() {
 	list.elements = []interface{}{}
 }
 
-func (list *List) Sort() {
-
+func (list *List) Sort(comparator utils.Comparator) {
+	if len(list.elements) < 2 {
+		return
+	}
+	utils.Sort(list.elements, comparator)
 }
 
 func (list *List) Swap(i, j int) {
