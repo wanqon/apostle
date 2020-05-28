@@ -11,22 +11,6 @@ type List struct {
 	size	int
 }
 
-func (list *List) Sort(comparator utils.Comparator) {
-	panic("implement me")
-}
-
-func (list *List) Swap(index1, index2 int) {
-	panic("implement me")
-}
-
-func (list *List) Insert(index int, values ...interface{}) {
-	panic("implement me")
-}
-
-func (list *List) Set(index int, value interface{}) {
-	panic("implement me")
-}
-
 type element struct {
 	value	interface{}
 	next	*element
@@ -156,6 +140,83 @@ func (list *List) Clear() {
 	list.size = 0
 	list.first = nil
 	list.last = nil
+}
+
+
+func (list *List) Sort(comparator utils.Comparator) {
+	if list.size < 2 {
+		return
+	}
+	values := list.Values()
+	utils.Sort(values, comparator)
+	list.Clear()
+	list.Add(values)
+}
+
+func (list *List) Swap(index1, index2 int) {
+	if list.withinRange(index1) && list.withinRange(index2) && index1 != index2 {
+		var e1,e2 *element
+		for i,currentElem := 0,list.first; e1!=nil&&e2!=nil;i,currentElem=i+1,currentElem.next{
+			switch i {
+			case index1:
+				e1 = currentElem
+			case index2:
+				e2 = currentElem
+			}
+		}
+		e1.value, e2.value = e2.value, e1.value
+	}
+}
+
+func (list *List) Insert(index int, values ...interface{}) {
+	if !list.withinRange(index) {
+		if list.size == index {
+			list.Add(values...)
+		}
+		return
+	}
+	list.size += len(values)
+	var beforeElem *element
+	foundElem := list.first
+	for i:=0;i!=index;i,foundElem=i+1,foundElem.next {
+		beforeElem = foundElem
+	}
+
+	if foundElem == list.first {
+		for i, value := range values {
+			newElem := &element{value: value}
+			if i == 0 {
+				list.first = newElem
+			} else {
+				beforeElem.next = newElem
+			}
+			beforeElem = newElem
+		}
+		beforeElem.next = foundElem
+	} else {
+		for _,v := range values {
+			newElem := &element{value: v}
+			beforeElem.next = newElem
+			beforeElem = newElem
+		}
+		beforeElem.next = foundElem
+	}
+
+
+}
+
+func (list *List) Set(index int, value interface{}) {
+	if !list.withinRange(index) {
+		if list.size == index {
+			list.Add(value)
+		}
+		return
+	}
+	foundElem := list.first
+	for i:=0;i!=index; {
+		i, foundElem = i+1, foundElem.next
+	}
+	foundElem.value = value
 }
 
 func (list *List) withinRange(index int) bool {
